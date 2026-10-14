@@ -194,6 +194,22 @@ type DirectoryMeta struct {
 	// - https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/
 	// The key is the profile name, and the value is a description.
 	Profiles map[string]string `json:"profiles,omitempty"`
+
+	// WIF is present when the server supports the wif-01 challenge. It is an
+	// EXPERIMENTAL DRAFT feature and is subject to change. See:
+	// https://datatracker.ietf.org/doc/draft-rasmussen-acme-wif/
+	WIF *DirectoryMetaWIF `json:"wif,omitempty"`
+}
+
+// DirectoryMetaWIF describes the server's support for Workload Identity
+// Federation. draft-rasmussen-acme-wif-00 §6
+type DirectoryMetaWIF struct {
+	// Issuer identifiers of WIF Tokens the server accepts.
+	Issuers []string `json:"issuers"`
+
+	// The maximum remaining validity, in seconds, that the server accepts
+	// for a WIF Token. Zero if not advertised.
+	MaxTokenLifetime int64 `json:"maxTokenLifetime,omitempty"`
 }
 
 // stack is a simple thread-safe stack.

@@ -104,6 +104,12 @@ type Challenge struct {
 	// Each name is in A-label format, lowercase, without trailing dot.
 	// draft-ietf-acme-dns-persist-00 §4.1
 	IssuerDomainNames []string `json:"issuer-domain-names,omitempty"`
+
+	// Issuers optionally lists the WIF Token issuer identifiers the server
+	// will accept for this authorization in a wif-01 challenge. When present,
+	// it narrows the issuers advertised in the directory metadata.
+	// draft-rasmussen-acme-wif-00 §4.2
+	Issuers []string `json:"issuers,omitempty"`
 }
 
 // HTTP01ResourcePath returns the URI path for solving the http-01 challenge.
@@ -204,6 +210,30 @@ func (c Challenge) DNSPersist01TXTRecordValue(a Account, issuerDomainName string
 	return value
 }
 
+// WIF01AudienceBindingValue returns the Audience Binding Value for the
+// wif-01 challenge: the value the client requests as the audience ("aud"
+// claim) of the WIF Token it presents to the server.
+//
+//	ABV = "urn:ietf:params:acme:wif:" || base64url(SHA-256(ASCII(keyAuthorization)))
+//
+// draft-rasmussen-acme-wif-00 §4.3
+func (c Challenge) WIF01AudienceBindingValue() string {
+	h := sha256.Sum256([]byte(c.KeyAuthorization))
+	return WIFAudiencePrefix + base64.RawURLEncoding.EncodeToString(h[:])
+}
+
+// WIFAudiencePrefix is the prefix of every WIF Audience Binding Value.
+// draft-rasmussen-acme-wif-00 §4.3
+const WIFAudiencePrefix = "urn:ietf:params:acme:wif:"
+
+// WIF01Response is the payload a client sends to the challenge URL to
+// respond to a wif-01 challenge. Set it as the Challenge's Payload.
+// draft-rasmussen-acme-wif-00 §4.3
+type WIF01Response struct {
+	// The WIF Token, in JWS Compact Serialization.
+	WIFToken string `json:"wifToken"`
+}
+
 // InitiateChallenge "indicates to the server that it is ready for the challenge
 // validation by sending an empty JSON body ('{}') carried in a POST request to
 // the challenge URL (not the authorization URL)." §7.5.1
@@ -228,4 +258,5 @@ const (
 	ChallengeTypeAuthorityToken = "tkauth-01"        // RFC 9447 §3 - ACME Authority Token challenge type
 	ChallengeTypeDNSAccount01   = "dns-account-01"   // draft-ietf-acme-dns-account-label-01 §5
 	ChallengeTypeDNSPersist01   = "dns-persist-01"   // draft-ietf-acme-dns-persist-00
+	ChallengeTypeWIF01          = "wif-01"           // draft-rasmussen-acme-wif-00 §4
 )

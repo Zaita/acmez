@@ -140,6 +140,7 @@ const (
 	ProblemTypeBadPublicKey            = ProblemTypeNamespace + "badPublicKey"
 	ProblemTypeBadRevocationReason     = ProblemTypeNamespace + "badRevocationReason"
 	ProblemTypeBadSignatureAlgorithm   = ProblemTypeNamespace + "badSignatureAlgorithm"
+	ProblemTypeBadWIFToken             = ProblemTypeNamespace + "badWifToken" // draft-rasmussen-acme-wif-00 §4.7
 	ProblemTypeCAA                     = ProblemTypeNamespace + "caa"
 	ProblemTypeCompound                = ProblemTypeNamespace + "compound"
 	ProblemTypeConnection              = ProblemTypeNamespace + "connection"
@@ -157,4 +158,8 @@ const (
 	ProblemTypeUnsupportedContact      = ProblemTypeNamespace + "unsupportedContact"
 	ProblemTypeUnsupportedIdentifier   = ProblemTypeNamespace + "unsupportedIdentifier"
 	ProblemTypeUserActionRequired      = ProblemTypeNamespace + "userActionRequired"
+	ProblemTypeWIFAudienceMismatch     = ProblemTypeNamespace + "wifAudienceMismatch"  // draft-rasmussen-acme-wif-00 §4.7
+	ProblemTypeWIFIssuerNotAccepted    = ProblemTypeNamespace + "wifIssuerNotAccepted" // draft-rasmussen-acme-wif-00 §4.7
+	ProblemTypeWIFPolicyDenied         = ProblemTypeNamespace + "wifPolicyDenied"      // draft-rasmussen-acme-wif-00 §4.7
+	ProblemTypeWIFTokenReplayed        = ProblemTypeNamespace + "wifTokenReplayed"     // draft-rasmussen-acme-wif-00 §4.7
 )

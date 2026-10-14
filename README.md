@@ -34,6 +34,7 @@ In other words, the `acmez` package is **porcelain** while the `acme` package is
 	- [RFC 8737](https://www.rfc-editor.org/rfc/rfc8737.html) (tls-alpn-01 challenge)
 	- [RFC 8823](https://www.rfc-editor.org/rfc/rfc8823.html) (email-reply-00 challenge; S/MIME)
 	- DNS Labeled With ACME Account ID Challenge ([draft-ietf-acme-dns-account-label-01](https://datatracker.ietf.org/doc/draft-ietf-acme-dns-account-label/01/))
+	- Workload Identity Federation challenge, wif-01, with a GitHub Actions solver ([draft-rasmussen-acme-wif-00](https://datatracker.ietf.org/doc/draft-rasmussen-acme-wif/))
 - ACME Renewal Information (ARI) support ([RFC 9773](https://datatracker.ietf.org/doc/html/rfc9773))
 - ACME profiles ([draft-aaron-acme-profiles](https://datatracker.ietf.org/doc/draft-aaron-acme-profiles/))
 
@@ -72,6 +73,19 @@ client := acmez.Client{
 ```
 
 If you're implementing a tls-alpn-01 solver, the `acmez` package can help. It has the constant [`ACMETLS1Protocol`](https://pkg.go.dev/github.com/mholt/acmez/v3#pkg-constants) which you can use to identify challenge handshakes by inspecting the ClientHello's ALPN extension. Simply complete the handshake using a certificate from the [`acmez.TLSALPN01ChallengeCert()`](https://pkg.go.dev/github.com/mholt/acmez/v3#TLSALPN01ChallengeCert) function to solve the challenge.
+
+If your CA supports the wif-01 challenge ([draft-rasmussen-acme-wif](https://datatracker.ietf.org/doc/draft-rasmussen-acme-wif/)), workloads can prove control of an identifier with a token from their identity provider. In a GitHub Actions workflow, grant the job `permissions: id-token: write` and use the built-in solver:
+
+```go
+client := acmez.Client{
+	ChallengeSolvers: map[string]acmez.Solver{
+		acme.ChallengeTypeWIF01: acmez.NewGitHubActionsWIF01Solver(),
+	},
+	// ...
+}
+```
+
+For other identity providers, use [`acmez.WIF01Solver`](https://pkg.go.dev/github.com/mholt/acmez/v3#WIF01Solver) with your own `TokenSource`.
 
 
 
